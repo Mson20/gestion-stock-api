@@ -108,5 +108,63 @@ namespace GestionStock.API.Controllers
             await _context.SaveChangesAsync();
             return NoContent();
         }
+
+        // GET /api/produits/export
+[HttpGet("export")]
+public async Task<IActionResult> ExportExcel()
+{
+    var produits = await _context.Produits.OrderBy(p => p.Nom).ToListAsync();
+
+    using var workbook = new ClosedXML.Excel.XLWorkbook();
+    var ws = workbook.Worksheets.Add("Stock");
+
+    // En-têtes
+    ws.Cell(1, 1).Value = "Nom";
+    ws.Cell(1, 2).Value = "Catégorie";
+    ws.Cell(1, 3).Value = "Fournisseur";
+    ws.Cell(1, 4).Value = "Stock";
+    ws.Cell(1, 5).Value = "Seuil alerte";
+    ws.Cell(1, 6).Value = "Prix (€)";
+    ws.Cell(1, 7).Value = "Statut";
+
+    // Style en-têtes
+    var headerRow = ws.Range(1, 1, 1, 7);
+    headerRow.Style.Font.Bold = true;
+    headerRow.Style.Fill.BackgroundColor = ClosedXML.Excel.XLColor.FromHtml("#6366f1");
+    headerRow.Style.Font.FontColor = ClosedXML.Excel.XLColor.White;
+
+    // Données
+    for (int i = 0; i < produits.Count; i++)
+    {
+        var p = produits[i];
+        var row = i + 2;
+        ws.Cell(row, 1).Value = p.Nom;
+        ws.Cell(row, 2).Value = p.Categorie;
+        ws.Cell(row, 3).Value = p.Fournisseur ?? "";
+        ws.Cell(row, 4).Value = p.Stock;
+        ws.Cell(row, 5).Value = p.SeuilAlerte;
+        ws.Cell(row, 6).Value = p.Prix;
+        ws.Cell(row, 7).Value = p.Stock == 0 ? "Rupture" :
+                                p.Stock <= p.SeuilAlerte ? "Alerte" : "OK";
+
+        // Couleur ligne selon statut
+        if (p.Stock == 0)
+            ws.Row(row).Style.Fill.BackgroundColor = ClosedXML.Excel.XLColor.FromHtml("#fee2e2");
+        else if (p.Stock <= p.SeuilAlerte)
+            ws.Row(row).Style.Fill.BackgroundColor = ClosedXML.Excel.XLColor.FromHtml("#fef3c7");
+    }
+
+    ws.Columns().AdjustToContents();
+
+    using var stream = new MemoryStream();
+    workbook.SaveAs(stream);
+    stream.Position = 0;
+
+    return File(
+        stream.ToArray(),
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        $"stock-{DateTime.Now:yyyy-MM-dd}.xlsx"
+    );
+}
     }
 }
