@@ -3,11 +3,11 @@ WORKDIR /app
 COPY *.csproj .
 RUN dotnet restore GestionStock.API.csproj
 COPY . .
-RUN dotnet publish GestionStock.API.csproj -c Release -o /app/out
+RUN dotnet publish GestionStock.API.csproj -c Release -o /app/publish
 
 FROM mcr.microsoft.com/dotnet/aspnet:8.0
 WORKDIR /app
-COPY --from=build /app/out .
-EXPOSE 8080
-ENV ASPNETCORE_URLS=http://+:8080
+COPY --from=build /app/publish .
+EXPOSE 10000
+ENV ASPNETCORE_URLS=http://+:10000
 ENTRYPOINT ["dotnet", "GestionStock.API.dll"]
