@@ -17,7 +17,9 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowAngular", policy =>
         policy.WithOrigins(
             "http://localhost:4200",
-            "https://gestion-stock-ui.vercel.app"
+    "https://gestion-de-stock-ee55.vercel.app",
+    "https://gestion-de-stock-ee55-ljwdrqjeb-mson20s-projects.vercel.app"
+
         )
         .AllowAnyHeader()
         .AllowAnyMethod());
