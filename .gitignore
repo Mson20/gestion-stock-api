@@ -1,0 +1,4 @@
+echo bin/ > .gitignore
+echo obj/ >> .gitignore
+echo gestion-stock-ui/ >> .gitignore
+echo gestionstock.db >> .gitignore

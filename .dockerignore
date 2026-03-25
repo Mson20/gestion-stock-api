@@ -1,0 +1,5 @@
+echo bin/ > .dockerignore
+echo obj/ >> .dockerignore
+echo gestion-stock-ui/ >> .dockerignore
+echo gestionstock.db >> .dockerignore
+echo *.sln >> .dockerignore
