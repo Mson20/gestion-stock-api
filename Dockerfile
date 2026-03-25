@@ -11,4 +11,4 @@ COPY --from=build /app/out .
 
 EXPOSE 80
 
-ENTRYPOINT ["dotnet", "TonProjet.dll"]
+ENTRYPOINT ["dotnet", "gestion-stock-api.dll"]
